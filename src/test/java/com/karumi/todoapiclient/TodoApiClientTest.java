@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import com.karumi.todoapiclient.dto.TaskDto;
+import com.karumi.todoapiclient.exception.ItemNotFoundException;
 import com.karumi.todoapiclient.exception.UnknownErrorException;
 
 import org.junit.Before;
@@ -69,16 +70,48 @@ public class TodoApiClientTest extends MockWebServerTest {
   }
 
   @Test (expected = UnknownErrorException.class)
-  public void shouldThrowExceptionFor500() throws Exception {
-    enqueueMockResponse(500, "getTasksResponse.json");
+  public void shouldThrowExceptionFor500InGetAllTasks() throws Exception {
+    enqueueMockResponse(500);
 
     apiClient.getAllTasks();
   }
 
-  @Test (expected = UnknownErrorException.class)
-  public void shouldThrowExceptionForMalformedJson() throws Exception {
-    enqueueMockResponse(500, "malformed.json");
+    @Test
+    public void parseTaskById() throws Exception {
+        enqueueMockResponse(200, "getTaskByIdResponse.json");
 
-    apiClient.getAllTasks();
-  }
+        TaskDto taskDto = apiClient.getTaskById("1");
+
+        assertTaskContainsExpectedValues(taskDto);
+    }
+
+    @Test (expected = ItemNotFoundException.class)
+    public void shouldThrowExceptionFor404InGetTaskById() throws Exception {
+        enqueueMockResponse(404);
+
+        apiClient.getTaskById("1");
+    }
+
+    @Test public void sendsAcceptAndContentTypeHeadersForGetTaskById() throws Exception {
+        enqueueMockResponse();
+
+        apiClient.getTaskById("1");
+
+        assertRequestContainsHeader("Accept", "application/json");
+    }
+
+    @Test (expected = UnknownErrorException.class)
+    public void shouldThrowExceptionFor500InGetTaskById() throws Exception {
+        enqueueMockResponse(500);
+
+        apiClient.getTaskById("1");
+    }
+
+    @Test public void sendsGetAllTaskRequestToTheCorrectEndpointGetTaskById() throws Exception {
+        enqueueMockResponse();
+
+        apiClient.getTaskById("1");
+
+        assertGetRequestSentTo("/todos/1");
+    }
 }
