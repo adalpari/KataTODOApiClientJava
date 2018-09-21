@@ -143,4 +143,40 @@ public class TodoApiClientTest extends MockWebServerTest {
 
         assertRequestContainsHeader("Accept", "application/json");
     }
+
+    @Test
+    public void sendsAcceptAndContentTypeHeadersForDeleteTask() throws Exception {
+        enqueueMockResponse();
+
+        apiClient.deleteTaskById("1");
+
+        assertRequestContainsHeader("Accept", "application/json");
+    }
+
+    @Test public void sendsGetDeleteTaskRequestToTheCorrectEndpoint() throws Exception {
+        enqueueMockResponse();
+
+        apiClient.deleteTaskById("1");
+
+        assertDeleteRequestSentTo("/todos/1");
+    }
+
+    @Test (expected = ItemNotFoundException.class)
+    public void shouldThrowExceptionFor404InDeleteTaskd() throws Exception {
+        enqueueMockResponse(404);
+
+        apiClient.deleteTaskById("1");
+    }
+
+    @Test (expected = UnknownErrorException.class)
+    public void shouldThrowExceptionFor500InGetDelete() throws Exception {
+        enqueueMockResponse(500);
+
+        apiClient.deleteTaskById("1");
+    }
+
+    @Test
+    public void shouldParseJsonForDeleteTask() throws Exception {
+        enqueueMockResponse(200);
+    }
 }
