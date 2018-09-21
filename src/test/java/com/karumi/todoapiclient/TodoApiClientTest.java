@@ -37,6 +37,9 @@ public class TodoApiClientTest extends MockWebServerTest {
     apiClient = new TodoApiClient(mockWebServerEndpoint);
   }
 
+
+  //region getAllTask
+
   @Test public void sendsAcceptAndContentTypeHeaders() throws Exception {
     enqueueMockResponse();
 
@@ -75,6 +78,10 @@ public class TodoApiClientTest extends MockWebServerTest {
 
     apiClient.getAllTasks();
   }
+
+    //endregion
+
+    //region get task by id
 
     @Test
     public void parseTaskById() throws Exception {
@@ -115,6 +122,10 @@ public class TodoApiClientTest extends MockWebServerTest {
         assertGetRequestSentTo("/todos/1");
     }
 
+    //endregion
+
+    //region add task
+
     @Test
     public void shouldReturnOkForAdTask() throws Exception {
       enqueueMockResponse(201, "addTaskResponse.json");
@@ -133,7 +144,7 @@ public class TodoApiClientTest extends MockWebServerTest {
     }
 
     private TaskDto createTask() {
-      return new TaskDto("9", "9", "do training", false);
+      return new TaskDto("1", "2", "Finish this kata", false);
     }
 
     @Test public void sendsAcceptAndContentTypeHeadersForCreateTask() throws Exception {
@@ -143,6 +154,10 @@ public class TodoApiClientTest extends MockWebServerTest {
 
         assertRequestContainsHeader("Accept", "application/json");
     }
+
+    //endregion
+
+    //region delete task
 
     @Test
     public void sendsAcceptAndContentTypeHeadersForDeleteTask() throws Exception {
@@ -179,4 +194,28 @@ public class TodoApiClientTest extends MockWebServerTest {
     public void shouldParseJsonForDeleteTask() throws Exception {
         enqueueMockResponse(200);
     }
+
+    //endregion
+
+    //region request
+
+    @Test
+    public void checkAddTaskRequestIsCorrect() throws Exception {
+        enqueueMockResponse(200);
+
+        apiClient.addTask(createTask());
+
+        assertRequestBodyEquals("addTaskRequest.json");
+    }
+
+    @Test
+    public void checkUpdateTaskRequestIsCorrect() throws Exception {
+        enqueueMockResponse(200);
+
+        apiClient.updateTaskById(createTask());
+
+        assertRequestBodyEquals("updateTaskRequest.json");
+    }
+
+    //endregion
 }
