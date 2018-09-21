@@ -15,13 +15,16 @@
 
 package com.karumi.todoapiclient;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import com.karumi.todoapiclient.dto.TaskDto;
-import java.util.List;
+import com.karumi.todoapiclient.exception.UnknownErrorException;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import java.util.List;
 
 public class TodoApiClientTest extends MockWebServerTest {
 
@@ -63,5 +66,19 @@ public class TodoApiClientTest extends MockWebServerTest {
     assertEquals(task.getUserId(), "1");
     assertEquals(task.getTitle(), "delectus aut autem");
     assertFalse(task.isFinished());
+  }
+
+  @Test (expected = UnknownErrorException.class)
+  public void shouldThrowExceptionFor500() throws Exception {
+    enqueueMockResponse(500, "getTasksResponse.json");
+
+    apiClient.getAllTasks();
+  }
+
+  @Test (expected = UnknownErrorException.class)
+  public void shouldThrowExceptionForMalformedJson() throws Exception {
+    enqueueMockResponse(500, "malformed.json");
+
+    apiClient.getAllTasks();
   }
 }
