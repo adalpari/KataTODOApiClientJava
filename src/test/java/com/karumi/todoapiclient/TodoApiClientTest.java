@@ -107,11 +107,40 @@ public class TodoApiClientTest extends MockWebServerTest {
         apiClient.getTaskById("1");
     }
 
-    @Test public void sendsGetAllTaskRequestToTheCorrectEndpointGetTaskById() throws Exception {
+    @Test public void sendsGetTaskByIdRequestToTheCorrectEndpoint() throws Exception {
         enqueueMockResponse();
 
         apiClient.getTaskById("1");
 
         assertGetRequestSentTo("/todos/1");
+    }
+
+    @Test
+    public void shouldReturnOkForAdTask() throws Exception {
+      enqueueMockResponse(201, "addTaskResponse.json");
+
+      TaskDto taskDto = apiClient.addTask(createTask());
+
+      assertTaskContainsExpectedValues(taskDto);
+    }
+
+    @Test public void sendsGetAddTaskRequestToTheCorrectEndpoint() throws Exception {
+        enqueueMockResponse();
+
+        apiClient.addTask(createTask());
+
+        assertPostRequestSentTo("/todos");
+    }
+
+    private TaskDto createTask() {
+      return new TaskDto("9", "9", "do training", false);
+    }
+
+    @Test public void sendsAcceptAndContentTypeHeadersForCreateTask() throws Exception {
+        enqueueMockResponse();
+
+        apiClient.addTask(createTask());
+
+        assertRequestContainsHeader("Accept", "application/json");
     }
 }
